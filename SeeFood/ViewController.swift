@@ -71,8 +71,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 // check if the first result contains the keyword "hotdog"
                 if firstResult.identifier.contains("hotdog") {
                     self.navigationItem.title = "Hotdog!"
+                    self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 0.5843137503, green: 0.8235294223, blue: 0.4196078479, alpha: 1)
                 } else {
                     self.navigationItem.title = "Not Hotdog!"
+                    self.navigationController?.navigationBar.barTintColor = #colorLiteral(red: 1, green: 0.1491314173, blue: 0, alpha: 1)
                 }
             }
             
