@@ -33,12 +33,52 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         // the info parameters contains the image that the user picked
         if let userPickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             imageView.image = userPickedImage
+            
+            // convert the image into a Core Image (necessary to use CoreML)
+            guard let ciimage = CIImage(image: userPickedImage) else {
+                fatalError("Coult not convert to CIImage.")
+            }
+            
+            // detect what the image contains using the Incepction V3 model
+            detect(image: ciimage)
         }
         
         // dismiss the imagePicker
         imagePicker.dismiss(animated: true, completion: nil)
         
     }
+    
+    
+    func detect(image: CIImage) {
+        
+        // define the container for the mlmodel (whatever it is)
+        // the parameter is the name of the auto generated class got from the mlmodel import
+        guard let model = try? VNCoreMLModel(for: Inceptionv3().model) else {
+            fatalError("Loading CoreML model failed.")
+        }
+        
+        // define the request
+        let request = VNCoreMLRequest(model: model) { (request, error) in
+            // if the request succedeed...
+            guard let results = request.results as? [VNClassificationObservation] else {
+                fatalError("Model failed to process the image")
+            }
+            print(results)
+        }
+        
+        // handler of the image we want to classify
+        let handler = VNImageRequestHandler(ciImage: image)
+        
+        do {
+            // perform the request by using the handler
+            try handler.perform([request])
+        } catch {
+            print(error)
+        }
+        
+        
+    }
+    
     
     @IBAction func cameraTapped(_ sender: UIBarButtonItem) {
         // let the image picker to appear
